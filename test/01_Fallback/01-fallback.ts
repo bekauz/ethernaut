@@ -10,7 +10,7 @@ let attacker: SignerWithAddress;
 let txn: any;
 let contract: Contract;
 
-describe.only("Fallback", () => {
+describe("Fallback", () => {
 
     beforeEach(async () => {
         [owner, attacker] = await ethers.getSigners();
@@ -25,7 +25,9 @@ describe.only("Fallback", () => {
     it("Should solve the challenge", async function () {
 
         const initialOwner = await contract.owner();
-        console.log(`initial owner: ${initialOwner}`);
+
+        assert.notEqual(initialOwner, attacker.address);
+
         // call contribute to add attacker address to contributions mapping
         txn = await contract.connect(attacker).contribute({
             value: ethers.utils.parseUnits(`1`, `wei`),
@@ -45,7 +47,6 @@ describe.only("Fallback", () => {
         await txn.wait();
 
         const currentOwner = await contract.owner();
-        console.log(`current owner: ${currentOwner}`);
-        assert(initialOwner != currentOwner);
+        assert.notEqual(initialOwner, currentOwner);
     });
 });
