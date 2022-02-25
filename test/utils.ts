@@ -146,7 +146,7 @@ const ETHERNAUT_ABI = [
 
 const ETHERNAUT_ADDRESS = "0xD991431D8b033ddCb84dAD257f4821E9d5b38C33";
 
-const getNewInstance = async (levelAddress: string) => {
+export const getNewInstance = async (levelAddress: string) => {
     // get an Ethernaut obj
     const contract: Contract = await ethers.getContractAt(
         ETHERNAUT_ABI,
@@ -170,4 +170,24 @@ const getNewInstance = async (levelAddress: string) => {
     )?.args.instance;
 };
 
-export default getNewInstance;
+export const submitInstance = async (instanceAddress: string) => {
+
+    // get an Ethernaut obj
+    const contract: Contract = await ethers.getContractAt(
+        ETHERNAUT_ABI,
+        ETHERNAUT_ADDRESS
+    );
+
+    // submit instance and grab receipt
+    let txn = await contract.submitLevelInstance(instanceAddress);
+    const txnReceipt = await txn.wait();
+
+    // no logs -> level incomplete, otherwise check for LevelCompleteLog
+    if (txnReceipt.logs.length === 0) {
+        return false;
+    } else {
+        return contract.interface.parseLog(
+            txnReceipt.logs[0]
+        ).name === 'LevelCompletedLog';
+    }
+};
