@@ -1,6 +1,7 @@
 import { Contract } from "ethers";
 import { ethers } from "hardhat";
 import { LogDescription } from "ethers/lib/utils";
+
 const ETHERNAUT_ABI = [
     {
         "anonymous": false,

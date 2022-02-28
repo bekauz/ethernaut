@@ -29,6 +29,7 @@ describe("CoinFlip", () => {
     it("Should solve the challenge", async function () {
         
         expect(await contract.consecutiveWins()).to.equal(BigNumber.from(0));        
+        expect(await submitInstance(contract.address)).to.be.false;
 
         for (let i = 0; i < 10; i++) {
             // call the fake contract which will in turn call the real one
