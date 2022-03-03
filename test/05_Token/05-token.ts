@@ -11,7 +11,7 @@ let attacker: SignerWithAddress;
 let txn: any;
 let contract: Contract;
 
-describe.only("Token", () => {
+describe("Token", () => {
 
     beforeEach(async () => {
         [owner, attacker] = await ethers.getSigners();
