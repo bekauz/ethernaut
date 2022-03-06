@@ -13,7 +13,7 @@ let contract: Contract;
 let attackContract: Contract;
 
 
-describe.only("Force", () => {
+describe("Force", () => {
 
     beforeEach(async () => {
         [owner, attacker] = await ethers.getSigners();
