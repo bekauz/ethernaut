@@ -1,4 +1,3 @@
-import { EtherscanProvider } from "@ethersproject/providers";
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
 import { Contract } from "ethers";
@@ -12,7 +11,7 @@ let attacker: SignerWithAddress;
 let txn: any;
 let contract: Contract;
 
-describe.only("Vault", () => {
+describe("Vault", () => {
 
     beforeEach(async () => {
         [owner, attacker] = await ethers.getSigners();
@@ -30,9 +29,6 @@ describe.only("Vault", () => {
         // storage is just a key-value store with position being the order in contract definition
         const locked = await owner.provider?.getStorageAt(contract.address, 0);
         const password = await owner.provider?.getStorageAt(contract.address, 1);
-
-        console.log(`locked: ${locked}`);
-        console.log(`password: ${password}`);
     
         txn = await contract.unlock(password);
         await txn.wait();

@@ -1,4 +1,4 @@
-import { Contract } from "ethers";
+import { BigNumber, Contract } from "ethers";
 import { ethers } from "hardhat";
 import { LogDescription } from "ethers/lib/utils";
 
@@ -147,7 +147,7 @@ const ETHERNAUT_ABI = [
 
 const ETHERNAUT_ADDRESS = "0xD991431D8b033ddCb84dAD257f4821E9d5b38C33";
 
-export const getNewInstance = async (levelAddress: string) => {
+export const getNewInstance = async (levelAddress: string, value?: BigNumber) => {
     // get an Ethernaut obj
     const contract: Contract = await ethers.getContractAt(
         ETHERNAUT_ABI,
@@ -156,7 +156,8 @@ export const getNewInstance = async (levelAddress: string) => {
     
     // create level instance and grab receipt
     let txn = await contract.createLevelInstance(
-        levelAddress
+        levelAddress,
+        { value }
     );
     const txnReceipt = await txn.wait();
 
