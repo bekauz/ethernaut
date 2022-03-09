@@ -1,10 +1,10 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
-import { BigNumber, Contract } from "ethers";
+import { Contract } from "ethers";
 import { ethers } from "hardhat";
 import { getNewInstance, submitInstance } from "../utils";
 
-const LEVEL_ADDRESS = "0x43BA674B4fbb8B157b7441C2187bCdD2cdF84FD5";
+const LEVEL_ADDRESS = "0xe6BA07257a9321e755184FB2F995e0600E78c16D";
 
 let owner: SignerWithAddress;
 let attacker: SignerWithAddress;
@@ -12,32 +12,30 @@ let txn: any;
 let contract: Contract;
 let attackContract: Contract;
 
-
-describe("King", () => {
+describe.only("Reentrance", () => {
 
     beforeEach(async () => {
         [owner, attacker] = await ethers.getSigners();
 
-        const contractFactory = await ethers.getContractFactory("King");
+        const contractFactory = await ethers.getContractFactory("Reentrance");
         const challengeAddr = await getNewInstance(LEVEL_ADDRESS, ethers.utils.parseEther("0.001"));
         contract = await contractFactory.attach(challengeAddr);
 
-        const attackContractFactory = await ethers.getContractFactory("KingAttack");
+        const attackContractFactory = await ethers.getContractFactory("ReentranceAttack");
         attackContract = await attackContractFactory.deploy(contract.address);
     });
 
     it("Should solve the challenge", async function () {
         expect(await submitInstance(contract.address)).to.be.false;
 
-
-        const currentPrize: BigNumber = await contract.prize(); 
-            
-        txn = await attackContract.attack({
-            value: currentPrize.add(ethers.utils.parseUnits("1", "wei"))
+        txn = await attackContract.donate({
+            value: ethers.utils.parseEther("0.001")
         });
         await txn.wait();
 
-        expect(await contract._king()).to.equal(attackContract.address);
+        console.log(await contract.balanceOf(attackContract.address));
+
+        
         expect(await submitInstance(contract.address), "level is not complete").to.be.true;
     });
 });
