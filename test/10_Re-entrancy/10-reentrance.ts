@@ -1,6 +1,6 @@
 import { SignerWithAddress } from "@nomiclabs/hardhat-ethers/signers";
 import { expect } from "chai";
-import { Contract } from "ethers";
+import { BigNumber, Contract } from "ethers";
 import { ethers } from "hardhat";
 import { getNewInstance, submitInstance } from "../utils";
 
@@ -27,15 +27,19 @@ describe.only("Reentrance", () => {
 
     it("Should solve the challenge", async function () {
         expect(await submitInstance(contract.address)).to.be.false;
+        let attackerBalance: BigNumber = await contract.balanceOf(attackContract.address);
 
-        txn = await attackContract.donate({
-            value: ethers.utils.parseEther("0.001")
+        expect(attackerBalance).to.be.equal(BigNumber.from(0));
+
+        txn = await attackContract.attack({
+            value: ethers.utils.parseEther("1.1"),
+            gasLimit: BigNumber.from("1000000")
         });
         await txn.wait();
 
-        console.log(await contract.balanceOf(attackContract.address));
+        attackerBalance = await contract.balanceOf(attackContract.address);    
 
-        
+        expect(attackerBalance).to.be.gt(BigNumber.from(0));
         expect(await submitInstance(contract.address), "level is not complete").to.be.true;
     });
 });
