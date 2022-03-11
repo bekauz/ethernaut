@@ -12,7 +12,7 @@ let txn: any;
 let contract: Contract;
 let attackContract: Contract;
 
-describe.only("Reentrance", () => {
+describe("Reentrance", () => {
 
     beforeEach(async () => {
         [owner, attacker] = await ethers.getSigners();
