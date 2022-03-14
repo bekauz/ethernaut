@@ -27,21 +27,12 @@ describe.only("Privacy", () => {
         expect(await submitInstance(contract.address)).to.be.false;
         expect(await contract.locked()).to.be.true;
 
-        let locked: any = await owner.provider?.getStorageAt(contract.address, 0);
-        let ID: any = await owner.provider?.getStorageAt(contract.address, 1);
-        let flattening: any = await owner.provider?.getStorageAt(contract.address, 2);
-        let denomination: any = await owner.provider?.getStorageAt(contract.address, 3);
-        let awkwardness: any = await owner.provider?.getStorageAt(contract.address, 4);
         let data: any = await owner.provider?.getStorageAt(contract.address, 5);
+        let slice = data.substring(0, 34);
 
-        expect(ethers.utils.isHexString(ID)).to.be.true;
-        expect(ethers.utils.isBytesLike(ID)).to.be.true;
-
-        let dataArray: Uint8Array = arrayify(data);
+        txn = await contract.unlock(slice);
+        await txn.wait();
         
-        console.log(dataArray);  
-        console.log(ethers.utils.zeroPad(dataArray.slice(16, 24), 16))
-
         expect(await contract.locked()).to.be.false;
         expect(await submitInstance(contract.address), "level is not complete").to.be.true;
     });
