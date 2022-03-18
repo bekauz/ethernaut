@@ -11,7 +11,7 @@ let attacker: SignerWithAddress;
 let txn: any;
 let contract: Contract;
 
-describe.only("NaughtCoin", () => {
+describe("NaughtCoin", () => {
 
     beforeEach(async () => {
         [owner, attacker] = await ethers.getSigners();
@@ -27,7 +27,7 @@ describe.only("NaughtCoin", () => {
 
         const initialBalance = await contract.balanceOf(owner.address);
         console.log(`initial balance: ${initialBalance}`);
-      
+
         expect(await submitInstance(contract.address), "level is not complete").to.be.true;
     });
 });

